@@ -2,10 +2,10 @@ package datacommunity.datapipeline
 
 import org.apache.spark.sql.{SaveMode, SparkSession}
 
-object OrderCSVProcessor {
+object OrderJSONProcessor {
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder
-      .appName("Order CSV Processor")
+      .appName("Order JSON Processor")
       .config("spark.driver.host", "127.0.0.1")
       .master("local")
       .getOrCreate()
@@ -19,9 +19,8 @@ object OrderCSVProcessor {
   }
 
   def run(spark: SparkSession, inputPath: String, outputPath: String): Unit = {
-
     spark.read
-      .csv(inputPath)
+      .json(inputPath)
       .write
       .mode(SaveMode.Overwrite)
       .csv(outputPath)
