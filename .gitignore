@@ -2,3 +2,5 @@
 /target/
 /project/project/target/
 /project/target/
+/data/output/*
+!/data/output/.gitkeep
