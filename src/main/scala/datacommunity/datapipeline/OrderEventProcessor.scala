@@ -50,7 +50,6 @@ object OrderEventProcessor {
       .withColumn("Title", $"item.title")
       .withColumn("Quantity", $"item.quantity")
       .select($"Title", $"Quantity", $"timestamp")
-      .withWatermark("timestamp", "2 seconds")
       .groupBy(
         window(
           $"timestamp",
