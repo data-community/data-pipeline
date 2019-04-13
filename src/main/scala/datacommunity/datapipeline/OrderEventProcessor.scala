@@ -18,7 +18,6 @@ object OrderEventProcessor {
       .master("local")
       .getOrCreate()
 
-
     run(spark)
   }
 
@@ -34,6 +33,7 @@ object OrderEventProcessor {
       ))
       )
     ))
+
     val dataFrame = spark.readStream
       .format("kafka")
       .option("kafka.bootstrap.servers", "127.0.0.1:9092")
@@ -44,18 +44,27 @@ object OrderEventProcessor {
     import spark.implicits._
 
     dataFrame
-        .withColumn("value", from_json($"value".cast("string"), schema))
+      .withColumn("value", from_json($"value".cast("string"), schema))
       .select($"value.*")
       .withColumn("item", explode($"payload.items"))
       .withColumn("Title", $"item.title")
       .withColumn("Quantity", $"item.quantity")
       .select($"Title", $"Quantity", $"timestamp")
+      .withWatermark("timestamp", "2 seconds")
+      .groupBy(
+        window(
+          $"timestamp",
+          "30 seconds",
+          "20 seconds"),
+        $"Title"
+      )
+      .sum("Quantity")
+      .withColumnRenamed("sum(Quantity)", "Total")
+      .select($"window.start" as "StartTime", $"window.end" as "EndTime", $"Title", $"Total")
       .writeStream
-      .outputMode(OutputMode.Append())
+      .outputMode(OutputMode.Complete())
       .format("console")
-      .option("truncate", "false")
       .start()
       .awaitTermination()
-
   }
 }
