@@ -23,6 +23,7 @@ object OrderJSONProcessor {
       .json(inputPath)
       .write
       .mode(SaveMode.Overwrite)
+      .option("header", "true")
       .csv(outputPath)
   }
 }
