@@ -24,6 +24,7 @@ object OrderCSVProcessor {
       .csv(inputPath)
       .write
       .mode(SaveMode.Overwrite)
+      .option("header", "true")
       .csv(outputPath)
   }
 }
